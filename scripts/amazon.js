@@ -92,10 +92,12 @@ document.querySelectorAll('.js-add-to-cart')
     button.addEventListener('click', ()=> {
       
       const {productId} = button.dataset;
+      const quantity = Number(document.querySelector(`.js-quantity-selector-${productId}`).value);
+
       //const productContainer = button.closest('.product-container');
       //const quantity = Number(productContainer.querySelector('.js-quantity-selector').value);
 
-      addToCart(productId);
+      addToCart(productId, quantity);
       addedMessageTimeoutId = updateCartDisplay(productId, addedMessageTimeoutId);
       
     });
