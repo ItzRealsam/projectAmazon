@@ -57,3 +57,16 @@ export function removeFromCart(productId) {
 
   saveToStorage();
 }
+
+export function updateCartQuantity(
+  productId,
+  newQuantity
+) {
+
+  const cartItem = getCartItem(productId);
+
+  cartItem.quantity = newQuantity;
+
+  saveToStorage();
+
+}
