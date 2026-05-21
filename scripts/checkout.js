@@ -1,18 +1,15 @@
-import { cart, removeFromCart } from '../data/cart.js';
-import { products } from '../data/products.js';
+import { calculateCartQuantity, cart, removeFromCart } from '../data/cart.js';
+import { products, getProduct } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
+
+const checkoutCartQuantity = document.querySelector('.js-checkout-header-cart-quantity');
+checkoutCartQuantity.innerText = '';
 
 let cartSummaryHTML = '';
 
 cart.forEach((cartItem) => {
   const productId = cartItem.productId;
-  let matchingItem;
-
-  products.forEach((product) => {
-    if (productId === product.id) {
-      matchingItem = product;
-    }
-  })
+  const matchingItem = getProduct(productId);
 
   cartSummaryHTML +=
   `
@@ -104,12 +101,25 @@ document.querySelector('.js-order-summary')
 document.querySelectorAll('.js-delete-quantity-link')
   .forEach((link) => {
     link.addEventListener('click', () => {
+
       const { productId } = link.dataset;
+
       removeFromCart(productId);
 
-      const container = document.querySelector(`.js-cart-item-container-${productId}`);
-      container.remove();
-    })
+      const container =
+        document.querySelector(
+          `.js-cart-item-container-${productId}`
+        );
 
-    
-  })
+      container.remove();
+
+      updateCheckoutCartQuantity();
+
+    });
+  });
+
+function updateCheckoutCartQuantity() {
+  checkoutCartQuantity.innerText = `${calculateCartQuantity()} items`;
+}
+
+updateCheckoutCartQuantity();
