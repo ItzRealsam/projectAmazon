@@ -73,3 +73,11 @@ export function updateCartQuantity(
   saveToStorage();
 
 }
+
+export function updateDeliveryOption(productId, deliveryOptionId) {
+  const cartItem = getCartItem(productId);
+
+  cartItem.deliveryOptionId = deliveryOptionId;
+
+  saveToStorage();
+}
