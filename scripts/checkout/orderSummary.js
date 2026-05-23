@@ -1,6 +1,6 @@
-import { calculateCartQuantity, cart, removeFromCart, updateCartQuantity, updateDeliveryOption } from '../../data/cart.js';
-import { calculateDeliveryDate, deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
-import { getProduct } from '../../data/products.js';
+import { calculateCartQuantity, cart, removeFromCart, updateCartQuantity, updateDeliveryOption } from '../data/cart.js';
+import { calculateDeliveryDate, deliveryOptions, getDeliveryOption } from '../data/deliveryOptions.js';
+import { getProduct } from '../data/products.js';
 import { renderPaymentSummary } from './paymentSummary.js';
 import formatCurrency from '../utils/money.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
