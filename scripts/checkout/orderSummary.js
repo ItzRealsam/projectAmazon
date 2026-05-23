@@ -25,7 +25,8 @@ export function renderOrderSummary() {
     cartSummaryHTML +=
     `
       <div class="cart-item-container
-      js-cart-item-container-${matchingItem.id}">
+        js-cart-item-container
+        js-cart-item-container-${matchingItem.id}">
         <div class="delivery-date">
           Delivery date: ${dateString}
         </div>
@@ -41,7 +42,8 @@ export function renderOrderSummary() {
             <div class="product-price">
               $${formatCurrency(matchingItem.priceCents)}
             </div>
-            <div class="product-quantity">
+            <div class="product-quantity
+              js-product-quantity-${matchingItem.id}">
               <span>
                 Quantity: <span class="quantity-label 
                   js-quantity-label-${matchingItem.id}">
@@ -61,7 +63,9 @@ export function renderOrderSummary() {
                 Save
               </span>
               <span class="delete-quantity-link 
-                js-delete-quantity-link link-primary"
+                js-delete-quantity-link
+                js-delete-quantity-link-${matchingItem.id}
+                link-primary"
                 data-product-id = "${matchingItem.id}">
                 Delete
               </span>
@@ -85,6 +89,9 @@ export function renderOrderSummary() {
   document.querySelector('.js-order-summary')
     .innerHTML = cartSummaryHTML;
 
+
+  /* 
+  //my former code May 23, 2026 - 1:39PM 
   document.querySelectorAll('.js-delete-quantity-link')
     .forEach((link) => {
       link.addEventListener('click', () => {
@@ -168,9 +175,71 @@ export function renderOrderSummary() {
   
   
   updateCheckoutHeader();
-}
+  */
 
-renderOrderSummary();
+  //AI Improvements
+
+  const orderSummaryContainer = document.querySelector('.js-order-summary');
+  orderSummaryContainer.innerHTML = cartSummaryHTML;
+
+  // 1. CAPTURE ALL CLICKS (Delete, Update, Save, and Delivery Options)
+  orderSummaryContainer.addEventListener('click', (event) => {
+    // Find the closest element matching our target class name
+    const target = event.target;
+
+    // Handle Delete Link
+    if (target.classList.contains('js-delete-quantity-link')) {
+      const { productId } = target.dataset;
+      removeFromCart(productId);
+      renderOrderSummary();
+      renderPaymentSummary();
+      return;
+    }
+
+    // Handle Update Link
+    if (target.classList.contains('js-update-quantity-link')) {
+      const { productId } = target.dataset;
+      const container = document.querySelector(`.js-cart-item-container-${productId}`);
+      const quantityLabel = container.querySelector('.quantity-label');
+      const input = container.querySelector('.quantity-input');
+
+      input.value = quantityLabel.innerText;
+      container.classList.add('is-editing-quantity');
+      return;
+    }
+
+    // Handle Save Link
+    if (target.classList.contains('js-save-quantity-link')) {
+      const { productId } = target.dataset;
+      saveQuantity(productId);
+      renderPaymentSummary();
+      return;
+    }
+
+    // Handle Delivery Option Row Click
+    const deliveryOption = target.closest('.js-delivery-option');
+    if (deliveryOption) {
+      const { productId, deliveryOptionId } = deliveryOption.dataset;
+      updateDeliveryOption(productId, deliveryOptionId);
+      renderOrderSummary();
+      renderPaymentSummary();
+    }
+  });
+
+  // 2. CAPTURE KEYDOWN EVENTS (Enter key on inputs)
+  orderSummaryContainer.addEventListener('keydown', (event) => {
+    const target = event.target;
+
+    if (target.classList.contains('quantity-input') && event.key === 'Enter') {
+      const { productId } = target.dataset;
+      saveQuantity(productId);
+      renderPaymentSummary();
+    }
+  });
+
+  updateCheckoutHeader();
+
+}
 
 function deliveryOptionsHTML(matchingItem, cartItem) {
   let html = ``;
@@ -231,7 +300,9 @@ function saveQuantity(productId) {
     return;
   }
 
+  const container = document.querySelector(`.js-cart-item-container-${productId}`);
+  container.classList.remove('is-editing-quantity');
+  
   updateCartQuantity(productId, newQuantity);
-
   renderOrderSummary();
 }
