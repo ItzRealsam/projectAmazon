@@ -1,15 +1,10 @@
 import { calculateCartQuantity, cart, removeFromCart, updateCartQuantity, updateDeliveryOption } from '../../data/cart.js';
-import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
+import { calculateDeliveryDate, deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
 import { getProduct } from '../../data/products.js';
 import { renderPaymentSummary } from './paymentSummary.js';
 import formatCurrency from '../utils/money.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
-
-
-const checkoutCartQuantity = document.querySelector('.js-checkout-header-cart-quantity');
-checkoutCartQuantity.innerText = '';
-
-const today = dayjs();
+import { updateCheckoutHeader } from './checkoutHeader.js';
 
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
@@ -172,7 +167,7 @@ export function renderOrderSummary() {
     })
   
   
-  updateCheckoutCartQuantity();
+  updateCheckoutHeader();
 }
 
 renderOrderSummary();
@@ -216,10 +211,6 @@ function deliveryOptionsHTML(matchingItem, cartItem) {
   return html
 }
 
-function updateCheckoutCartQuantity() {
-  checkoutCartQuantity.innerText = `${calculateCartQuantity()} items`;
-}
-
 function saveQuantity(productId) {
 
   const input = document.querySelector(
@@ -243,13 +234,4 @@ function saveQuantity(productId) {
   updateCartQuantity(productId, newQuantity);
 
   renderOrderSummary();
-}
-
-function calculateDeliveryDate(deliveryOption) {
-
-  return today.add(
-    deliveryOption.deliveryDays,
-    'days'
-  );
-
 }
