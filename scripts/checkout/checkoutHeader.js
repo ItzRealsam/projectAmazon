@@ -1,4 +1,4 @@
-import { calculateCartQuantity } from "../data/cart.js";
+import { cart } from "../data/cart-class.js";
 
 export function updateCheckoutHeader() {
   const checkoutCartQuantity = document.querySelector('.js-checkout-header-cart-quantity');
@@ -7,5 +7,5 @@ export function updateCheckoutHeader() {
   // Guard clause protects your test environment from crashing
   if (!checkoutCartQuantity) return;
 
-  checkoutCartQuantity.innerText = `${calculateCartQuantity()} items`;
+  checkoutCartQuantity.innerText = `${cart.calculateCartQuantity()} items`;
 }

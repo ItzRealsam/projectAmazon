@@ -81,7 +81,7 @@ class Cart {
     const cartItem = this.getCartItem(productId);
 
     if (!cartItem) return; 
-    
+
     cartItem.quantity = newQuantity;
 
     this.saveCartToStorage();
@@ -104,13 +104,7 @@ class Cart {
 };
 
 
-const cart = new Cart('cart-oop');
-const businessCart = new Cart('cart-business');
-
-//cart.addToCart('83d4ca15-0f35-48f5-b7a3-1ea210004f2e');
-
-console.log(cart);
-console.log(businessCart);
+export const cart = new Cart('cart');
 
 
 

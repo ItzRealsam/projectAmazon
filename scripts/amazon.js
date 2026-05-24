@@ -1,4 +1,4 @@
-import { cart, addToCart, calculateCartQuantity } from "./data/cart.js";
+import { cart } from "./data/cart-class.js";
 import { products } from "./data/products.js";
 import { formatCurrency } from "./utils/money.js";
 
@@ -19,14 +19,14 @@ products.forEach((product) => {
 
       <div class="product-rating-container">
         <img class="product-rating-stars"
-          src="images/ratings/rating-${product.rating.stars * 10}.png">
+          src="${product.getRatingStarsUrl()}">
         <div class="product-rating-count link-primary">
           ${product.rating.count}
         </div>
       </div>
 
       <div class="product-price">
-        $${formatCurrency(product.priceCents)}
+        ${product.getPrice()}
       </div>
 
       <div class="product-quantity-container">
@@ -63,12 +63,12 @@ document.querySelector('.products-grid')
   .innerHTML = productsHTML;
 
 const homeCartQuantity = document.querySelector('.js-cart-quantity');
-homeCartQuantity.innerText = calculateCartQuantity();
+homeCartQuantity.innerText = cart.calculateCartQuantity();
 
 function updateCartDisplay(productId, addedMessageTimeoutId) {
   const addedMessage = document.querySelector(`.js-added-to-cart-${productId}`);
   
-  homeCartQuantity.innerText = calculateCartQuantity();
+  homeCartQuantity.innerText = cart.calculateCartQuantity();
   
   addedMessage.classList.add('added-to-cart-visible');
 
@@ -94,7 +94,7 @@ document.querySelectorAll('.js-add-to-cart')
       //const productContainer = button.closest('.product-container');
       //const quantity = Number(productContainer.querySelector('.js-quantity-selector').value);
 
-      addToCart(productId, quantity);
+      cart.addToCart(productId, quantity);
       addedMessageTimeoutId = updateCartDisplay(productId, addedMessageTimeoutId);
       
     });

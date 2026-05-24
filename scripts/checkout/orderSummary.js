@@ -1,4 +1,4 @@
-import { calculateCartQuantity, cart, removeFromCart, updateCartQuantity, updateDeliveryOption } from '../data/cart.js';
+import { cart } from '../data/cart-class.js';
 import { calculateDeliveryDate, deliveryOptions, getDeliveryOption } from '../data/deliveryOptions.js';
 import { getProduct } from '../data/products.js';
 import { renderPaymentSummary } from './paymentSummary.js';
@@ -9,7 +9,7 @@ import { updateCheckoutHeader } from './checkoutHeader.js';
 export function renderOrderSummary() {
   let cartSummaryHTML = '';
 
-  cart.forEach((cartItem) => {
+  cart.cartItems.forEach((cartItem) => {
     const productId = cartItem.productId;
     const matchingItem = getProduct(productId);
 
@@ -42,7 +42,7 @@ export function renderOrderSummary() {
             </div>
             <div class="product-price
               js-product-price-${matchingItem.id}">
-              $${formatCurrency(matchingItem.priceCents)}
+              ${matchingItem.getPrice()}
             </div>
             <div class="product-quantity
               js-product-quantity-${matchingItem.id}">
@@ -88,19 +88,21 @@ export function renderOrderSummary() {
 
   });
 
-  document.querySelector('.js-order-summary')
-    .innerHTML = cartSummaryHTML;
+  
 
 
   /* 
   //my former code May 23, 2026 - 1:39PM 
+  document.querySelector('.js-order-summary')
+    .innerHTML = cartSummaryHTML;
+    
   document.querySelectorAll('.js-delete-quantity-link')
     .forEach((link) => {
       link.addEventListener('click', () => {
 
         const { productId } = link.dataset;
 
-        removeFromCart(productId);
+        cart.removeFromCart(productId);
 
         renderOrderSummary();
         renderPaymentSummary();
@@ -168,7 +170,7 @@ export function renderOrderSummary() {
         
         const { productId, deliveryOptionId } = deliveryOption.dataset;
         
-        updateDeliveryOption(productId, deliveryOptionId);
+        cart.updateDeliveryOption(productId, deliveryOptionId);
         renderOrderSummary();
         renderPaymentSummary();
       })
@@ -192,7 +194,7 @@ export function renderOrderSummary() {
     // Handle Delete Link
     if (target.classList.contains('js-delete-quantity-link')) {
       const { productId } = target.dataset;
-      removeFromCart(productId);
+      cart.removeFromCart(productId);
       renderOrderSummary();
       renderPaymentSummary();
       return;
@@ -222,7 +224,7 @@ export function renderOrderSummary() {
     const deliveryOption = target.closest('.js-delivery-option');
     if (deliveryOption) {
       const { productId, deliveryOptionId } = deliveryOption.dataset;
-      updateDeliveryOption(productId, deliveryOptionId);
+      cart.updateDeliveryOption(productId, deliveryOptionId);
       renderOrderSummary();
       renderPaymentSummary();
     }
@@ -308,6 +310,6 @@ function saveQuantity(productId) {
   const container = document.querySelector(`.js-cart-item-container-${productId}`);
   container.classList.remove('is-editing-quantity');
   
-  updateCartQuantity(productId, newQuantity);
+  cart.updateCartQuantity(productId, newQuantity);
   renderOrderSummary();
 }
