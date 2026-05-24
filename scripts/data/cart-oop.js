@@ -74,6 +74,8 @@ function Cart(localStorageKey) {
 
       const cartItem = this.getCartItem(productId);
 
+      if (!cartItem) return; 
+      
       cartItem.quantity = newQuantity;
 
       this.saveCartToStorage();
@@ -101,7 +103,6 @@ function Cart(localStorageKey) {
 const cart = Cart('cart-oop');
 
 cart.loadCartFromStorage();
-
 
 
 

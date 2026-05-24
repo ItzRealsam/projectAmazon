@@ -76,6 +76,8 @@ export function updateCartQuantity(
 
   const cartItem = getCartItem(productId);
 
+  if (!cartItem) return; 
+  
   cartItem.quantity = newQuantity;
 
   saveCartToStorage();
