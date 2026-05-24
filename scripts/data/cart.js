@@ -1,3 +1,5 @@
+import { getDeliveryOption } from "./deliveryOptions.js";
+
 export let cart;
 
 loadCartFromStorage();
@@ -82,6 +84,11 @@ export function updateCartQuantity(
 
 export function updateDeliveryOption(productId, deliveryOptionId) {
   const cartItem = getCartItem(productId);
+  const deliveryOption = getDeliveryOption(deliveryOptionId);
+
+  if (!cartItem || !deliveryOption) {
+    return
+  }
 
   cartItem.deliveryOptionId = deliveryOptionId;
 
