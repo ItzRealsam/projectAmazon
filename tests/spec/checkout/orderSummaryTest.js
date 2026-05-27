@@ -1,17 +1,27 @@
-import { renderOrderSummary } from "../../../scripts/checkout/orderSummary.js";
+import { initOrderSummaryListeners, renderOrderSummary } from "../../../scripts/checkout/orderSummary.js";
 import { cart } from "../../../scripts/data/cart-class.js";
+import { loadProducts } from "../../../scripts/data/products.js";
 
 describe('test suite: renderOrderSummary', () => {
 
   const productId1 = 'e43638ce-6aa0-4b85-b27f-e1d07eb678c6';
   const productId2 = '15b6fc6f-327a-4ec4-896f-486349e85a3d';
 
+  beforeAll((done) => {
+    loadProducts(() => {
+      done(); // Tells Jasmine it is safe to proceed to beforeEach hooks
+    });
+  });
+
   beforeEach(() => {
     document.querySelector('.js-test-container')
     .innerHTML = `
       <div class="js-checkout-header-cart-quantity"></div>
       <div class="js-order-summary"></div>
-      <div class="js-payment-summary"></div>
+      <div class="js-payment-summary">
+        <div class="js-payment-summary-shipping"></div>
+        <div class="js-payment-summary-total"></div>
+      </div>
     `;
 
     spyOn(localStorage, 'setItem');
@@ -33,6 +43,7 @@ describe('test suite: renderOrderSummary', () => {
     
     cart.loadCartFromStorage();  
     renderOrderSummary();
+    initOrderSummaryListeners();
 
   })
 

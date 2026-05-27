@@ -1,13 +1,17 @@
-import { cart } from '../data/cart-class.js';
-import { calculateDeliveryDate, deliveryOptions, getDeliveryOption } from '../data/deliveryOptions.js';
-import { getProduct } from '../data/products.js';
-import { renderPaymentSummary } from './paymentSummary.js';
-import formatCurrency from '../utils/money.js';
-import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
-import { updateCheckoutHeader } from './checkoutHeader.js';
+import { cart } from "../data/cart-class.js";
+import {
+  calculateDeliveryDate,
+  deliveryOptions,
+  getDeliveryOption,
+} from "../data/deliveryOptions.js";
+import { getProduct } from "../data/products.js";
+import { renderPaymentSummary } from "./paymentSummary.js";
+import formatCurrency from "../utils/money.js";
+import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
+import { updateCheckoutHeader } from "./checkoutHeader.js";
 
 export function renderOrderSummary() {
-  let cartSummaryHTML = '';
+  let cartSummaryHTML = "";
 
   cart.cartItems.forEach((cartItem) => {
     const productId = cartItem.productId;
@@ -17,13 +21,10 @@ export function renderOrderSummary() {
     const deliveryOption = getDeliveryOption(deliveryOptionId);
 
     const deliveryDate = calculateDeliveryDate(deliveryOption);
-    
-    const dateString = deliveryDate.format(
-      'dddd, MMMM D'
-    );
 
-    cartSummaryHTML +=
-    `
+    const dateString = deliveryDate.format("dddd, MMMM D");
+
+    cartSummaryHTML += `
       <div class="cart-item-container
         js-cart-item-container
         js-cart-item-container-${matchingItem.id}">
@@ -85,179 +86,97 @@ export function renderOrderSummary() {
         </div>
       </div>
     `;
-
   });
 
+  const container = document.querySelector(".js-order-summary");
+  if (container) {
+    container.innerHTML = cartSummaryHTML;
+  }
+
+  updateCheckoutHeader();
+}
+
+export function initOrderSummaryListeners() {
   
+  const orderSummaryContainer = document.querySelector(".js-order-summary");
 
+  if (orderSummaryContainer) {
+    // 1. CAPTURE ALL CLICKS (Delete, Update, Save, and Delivery Options)
+    orderSummaryContainer.addEventListener("click", (event) => {
+      // Find the closest element matching our target class name
+      const target = event.target;
 
-  /* 
-  //my former code May 23, 2026 - 1:39PM 
-  document.querySelector('.js-order-summary')
-    .innerHTML = cartSummaryHTML;
-    
-  document.querySelectorAll('.js-delete-quantity-link')
-    .forEach((link) => {
-      link.addEventListener('click', () => {
-
-        const { productId } = link.dataset;
-
+      // Handle Delete Link
+      if (target.classList.contains("js-delete-quantity-link")) {
+        const { productId } = target.dataset;
         cart.removeFromCart(productId);
-
         renderOrderSummary();
         renderPaymentSummary();
+        return;
+      }
 
-      });
-    });
-
-  document.querySelectorAll('.js-update-quantity-link')
-    .forEach((link) => {
-      link.addEventListener('click', () => {
-
-        const { productId } = link.dataset;
-
-        const container =
-          document.querySelector(
-            `.js-cart-item-container-${productId}`
-          );
-
-        const quantityLabel =
-          container.querySelector('.quantity-label');
-
-        const input =
-          container.querySelector('.quantity-input');
+      // Handle Update Link
+      if (target.classList.contains("js-update-quantity-link")) {
+        const { productId } = target.dataset;
+        const container = document.querySelector(
+          `.js-cart-item-container-${productId}`,
+        );
+        const quantityLabel = container.querySelector(".quantity-label");
+        const input = container.querySelector(".quantity-input");
 
         input.value = quantityLabel.innerText;
-        
-        container.classList.add('is-editing-quantity');
-      })
-      
-    })
+        container.classList.add("is-editing-quantity");
+        return;
+      }
 
-  document.querySelectorAll('.js-save-quantity-link')
-    .forEach((link) => {
-      link.addEventListener('click', () => {
-
-        const { productId } = link.dataset;
-
+      // Handle Save Link
+      if (target.classList.contains("js-save-quantity-link")) {
+        const { productId } = target.dataset;
         saveQuantity(productId);
         renderPaymentSummary();
-      })
-      
-    })
+        return;
+      }
 
-  document.querySelectorAll('.quantity-input')
-    .forEach((input) => {
-
-      input.addEventListener('keydown', (event) => {
-
-        if (event.key === 'Enter') {
-
-          const { productId } = input.dataset;
-
-          saveQuantity(productId);
-          renderPaymentSummary();
-        }
-
-      });
-
-    });
-
-  document.querySelectorAll('.js-delivery-option')
-    .forEach( (deliveryOption) => {
-      
-      deliveryOption.addEventListener('click', () => {
-        
+      // Handle Delivery Option Row Click
+      const deliveryOption = target.closest(".js-delivery-option");
+      if (deliveryOption) {
         const { productId, deliveryOptionId } = deliveryOption.dataset;
-        
         cart.updateDeliveryOption(productId, deliveryOptionId);
         renderOrderSummary();
         renderPaymentSummary();
-      })
+      }
+    });
 
-    })
-  
-  
-  updateCheckoutHeader();
-  */
+    // 2. CAPTURE KEYDOWN EVENTS (Enter key on inputs)
+    orderSummaryContainer.addEventListener("keydown", (event) => {
+      const target = event.target;
 
-  //AI Improvements
-
-  const orderSummaryContainer = document.querySelector('.js-order-summary');
-  orderSummaryContainer.innerHTML = cartSummaryHTML;
-
-  // 1. CAPTURE ALL CLICKS (Delete, Update, Save, and Delivery Options)
-  orderSummaryContainer.addEventListener('click', (event) => {
-    // Find the closest element matching our target class name
-    const target = event.target;
-
-    // Handle Delete Link
-    if (target.classList.contains('js-delete-quantity-link')) {
-      const { productId } = target.dataset;
-      cart.removeFromCart(productId);
-      renderOrderSummary();
-      renderPaymentSummary();
-      return;
-    }
-
-    // Handle Update Link
-    if (target.classList.contains('js-update-quantity-link')) {
-      const { productId } = target.dataset;
-      const container = document.querySelector(`.js-cart-item-container-${productId}`);
-      const quantityLabel = container.querySelector('.quantity-label');
-      const input = container.querySelector('.quantity-input');
-
-      input.value = quantityLabel.innerText;
-      container.classList.add('is-editing-quantity');
-      return;
-    }
-
-    // Handle Save Link
-    if (target.classList.contains('js-save-quantity-link')) {
-      const { productId } = target.dataset;
-      saveQuantity(productId);
-      renderPaymentSummary();
-      return;
-    }
-
-    // Handle Delivery Option Row Click
-    const deliveryOption = target.closest('.js-delivery-option');
-    if (deliveryOption) {
-      const { productId, deliveryOptionId } = deliveryOption.dataset;
-      cart.updateDeliveryOption(productId, deliveryOptionId);
-      renderOrderSummary();
-      renderPaymentSummary();
-    }
-  });
-
-  // 2. CAPTURE KEYDOWN EVENTS (Enter key on inputs)
-  orderSummaryContainer.addEventListener('keydown', (event) => {
-    const target = event.target;
-
-    if (target.classList.contains('quantity-input') && event.key === 'Enter') {
-      const { productId } = target.dataset;
-      saveQuantity(productId);
-      renderPaymentSummary();
-    }
-  });
-
-  updateCheckoutHeader();
+      if (
+        target.classList.contains("quantity-input") &&
+        event.key === "Enter"
+      ) {
+        const { productId } = target.dataset;
+        saveQuantity(productId);
+        renderPaymentSummary();
+      }
+    });
+  }
 
 }
+
+initOrderSummaryListeners();
 
 function deliveryOptionsHTML(matchingItem, cartItem) {
   let html = ``;
 
   deliveryOptions.forEach((deliveryOption) => {
-
     const deliveryDate = calculateDeliveryDate(deliveryOption);
-    
-    const dateString = deliveryDate.format(
-      'dddd, MMMM D'
-    );
-    const priceString = deliveryOption.priceCents === 0
-      ? 'FREE'
-      : `$${formatCurrency(deliveryOption.priceCents)} -`;
+
+    const dateString = deliveryDate.format("dddd, MMMM D");
+    const priceString =
+      deliveryOption.priceCents === 0
+        ? "FREE"
+        : `$${formatCurrency(deliveryOption.priceCents)} -`;
 
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
@@ -268,7 +187,7 @@ function deliveryOptionsHTML(matchingItem, cartItem) {
         data-product-id = "${matchingItem.id}"
         data-delivery-option-id = "${deliveryOption.id}">
         <input type="radio"
-          ${isChecked ? 'checked' : ''}
+          ${isChecked ? "checked" : ""}
           class="delivery-option-input
             js-delivery-option-input-${matchingItem.id}-${deliveryOption.id}"
           name="delivery-option-${matchingItem.id}">
@@ -281,35 +200,28 @@ function deliveryOptionsHTML(matchingItem, cartItem) {
           </div>
         </div>
       </div>
-    `
-  })
+    `;
+  });
 
-  return html
+  return html;
 }
 
 function saveQuantity(productId) {
-
-  const input = document.querySelector(
-    `.js-quantity-input-${productId}`
-  );
+  const input = document.querySelector(`.js-quantity-input-${productId}`);
 
   const newQuantity = Number(input.value);
 
-  if (
-    newQuantity < 1 ||
-    isNaN(newQuantity) ||
-    !Number.isInteger(newQuantity)
-  ) {
-    alert(
-      'Quantity must be a whole number at least 1'
-    );
+  if (newQuantity < 1 || isNaN(newQuantity) || !Number.isInteger(newQuantity)) {
+    alert("Quantity must be a whole number at least 1");
 
     return;
   }
 
-  const container = document.querySelector(`.js-cart-item-container-${productId}`);
-  container.classList.remove('is-editing-quantity');
-  
+  const container = document.querySelector(
+    `.js-cart-item-container-${productId}`,
+  );
+  container.classList.remove("is-editing-quantity");
+
   cart.updateCartQuantity(productId, newQuantity);
   renderOrderSummary();
 }
