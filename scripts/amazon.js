@@ -1,7 +1,9 @@
 import { cart } from "./data/cart-class.js";
-import { loadProducts, products } from "./data/products.js";
+import { loadProductsFetch, products } from "./data/products.js";
 
-loadProducts(renderProductsGrid);
+loadProductsFetch().then(() => {
+  renderProductsGrid();
+});
 
 const homeCartQuantity = document.querySelector('.js-cart-quantity');
 if (homeCartQuantity) {
