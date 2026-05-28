@@ -7,3 +7,5 @@ export function updateHeader() {
     homeCartQuantity.innerText = cart.calculateCartQuantity();
   }
 }
+
+export default updateHeader;
