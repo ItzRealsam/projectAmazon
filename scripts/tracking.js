@@ -1,10 +1,10 @@
 import { getOrder, getProductFromOrder } from "./data/orders.js";
 import { getProduct, loadProductsFetch } from "./data/products.js";
-import { updateHeader } from "./header.js";
+import { renderHeader } from "./header.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
 
 async function loadPage() {
-  updateHeader();
+  renderHeader();
 
   await loadProductsFetch();
 
@@ -31,10 +31,13 @@ function renderTracking() {
   const orderTime = dayjs(matchingOrder.orderTime);
   const deliveryTime = dayjs(matchingItem.estimatedDeliveryTime);
   
+  const deliveredMessage = currentTime < deliveryTime ? 'Arriving on' : 'Delivered on';
+  
   // 1. Calculate durations using the native .diff() method in milliseconds
   const totalDuration = deliveryTime.diff(orderTime); // Total delivery window
   const elapsedDuration = currentTime.diff(orderTime); // Time passed since order
 
+  
   let progressCalculation = totalDuration === 0 
     ? 0 
     : (elapsedDuration / totalDuration) * 100;
@@ -56,7 +59,7 @@ function renderTracking() {
       </a>
 
       <div class="delivery-date">
-        Arriving on  ${deliveryTime.format("dddd, MMMM D")}
+        ${deliveredMessage} on  ${deliveryTime.format("dddd, MMMM D")}
       </div>
 
       <div class="product-info">

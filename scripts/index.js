@@ -1,16 +1,24 @@
 import { cart } from "./data/cart-class.js";
 import { loadProductsFetch, products } from "./data/products.js";
+import { renderHeader, updateHeader } from "./header.js";
 
-loadProductsFetch().then(() => {
-  renderProductsGrid();
-});
+async function loadPage() {
+  try {
+    renderHeader();
 
-const homeCartQuantity = document.querySelector('.js-cart-quantity');
-if (homeCartQuantity) {
-  homeCartQuantity.innerText = cart.calculateCartQuantity();
+    await loadProductsFetch();
+
+    handleSearchAndRender();
+
+  }
+  catch(error) {
+    console.error('Error rendering page', error);
+  }
 }
 
-function renderProductsGrid() {
+loadPage();
+
+function renderProductsGrid(products) {
   let productsHTML = ``
 
   products.forEach((product) => {
@@ -85,10 +93,10 @@ function setupCartEventListeners() {
       button.addEventListener('click', ()=> {
         
         const { productId } = button.dataset;
-        const quantity = Number(document.querySelector(`.js-quantity-selector-${productId}`).value);
+        //const quantity = Number(document.querySelector(`.js-quantity-selector-${productId}`).value);
 
-        //const productContainer = button.closest('.product-container');
-        //const quantity = Number(productContainer.querySelector('.js-quantity-selector').value);
+        const productContainer = button.closest('.product-container');
+        const quantity = Number(productContainer.querySelector('.js-quantity-selector').value);
 
         cart.addToCart(productId, quantity);
         addedMessageTimeoutId = updateCartDisplay(productId, addedMessageTimeoutId);
@@ -100,7 +108,7 @@ function setupCartEventListeners() {
 function updateCartDisplay(productId, addedMessageTimeoutId) {
   const addedMessage = document.querySelector(`.js-added-to-cart-${productId}`);
   
-  homeCartQuantity.innerText = cart.calculateCartQuantity();
+  updateHeader();
   
   addedMessage.classList.add('added-to-cart-visible');
 
@@ -111,4 +119,31 @@ function updateCartDisplay(productId, addedMessageTimeoutId) {
   return setTimeout(() => {
     addedMessage.classList.remove('added-to-cart-visible');
   }, 2000);
+}
+
+function handleSearchAndRender() {
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchTerm = urlParams.get('search');
+
+  let productsToRender = products;
+
+  if (searchTerm) {
+    const lowerSearch = searchTerm.toLowerCase();
+
+    productsToRender = products.filter((product) => {
+
+      const nameMatch = product.name.toLowerCase().includes(lowerSearch);
+
+      const keywordMatch = product.keywords.some((keyword) => {
+        return keyword.toLowerCase().includes(lowerSearch);
+      });
+
+      return nameMatch || keywordMatch;
+    });
+  }
+
+
+  renderProductsGrid(productsToRender);
+
 }

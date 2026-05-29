@@ -77,6 +77,24 @@ export class Appliance extends Product {
 
 export let products = [];
 
+export async function loadProductsFetch() {
+  try {
+    const response = await fetch('https://supersimplebackend.dev/products');
+    const productsData = await response.json();
+
+    products = productsData.map((productDetails) => {
+      if (productDetails.type === 'clothing') return new Clothing(productDetails);
+      if (productDetails.type === 'appliance') return new Appliance(productDetails);
+      return new Product(productDetails);
+    });
+
+    console.log('Load products via Async/Await');
+  } catch (error) {
+    console.error('Error loading products from backend:', error);
+  }
+}
+
+/*
 export function loadProductsFetch() {
   const promise = fetch(
     'https://supersimplebackend.dev/products'
@@ -102,6 +120,7 @@ export function loadProductsFetch() {
 
   return promise;
 }
+*/
 
 export function loadProducts(fun) {
   const xhr = new XMLHttpRequest();

@@ -1,23 +1,27 @@
 import { cart } from "./data/cart-class.js";
 import { orders } from "./data/orders.js";
 import { getProduct, loadProductsFetch } from "./data/products.js";
-import { updateHeader } from "./header.js";
+import { renderHeader, updateHeader } from "./header.js";
 import formatCurrency from "./utils/money.js";
 import dayjs from "https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js";
 
 console.log(orders);
 
 async function loadPage() {
-  updateHeader();
+  try {
+    renderHeader();
 
-  await loadProductsFetch();
+    await loadProductsFetch();
 
-  renderOrders();
-  console.log('orders page loaded');
+    renderOrders();
+    console.log('orders page loaded');
 
-  initOrdersListeners();
-  console.log('listeners attached');
-
+    initOrdersListeners();
+    console.log('listeners attached');
+  }
+  catch (error) {
+    console.error('Error rendering page', error);
+  }
 }
 
 function renderOrders() {
@@ -133,7 +137,5 @@ export function initOrdersListeners() {
     });
   }
 }
-
-
 
 loadPage();

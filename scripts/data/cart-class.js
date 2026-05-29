@@ -45,6 +45,11 @@ class Cart {
     return cartQuantity;
   };
 
+  resetCart() {
+    this.cartItems = [];
+    this.saveCartToStorage();
+  }
+
   addToCart(productId, quantity = 1) {
     const matchingItem = this.getCartItem(productId);
 
